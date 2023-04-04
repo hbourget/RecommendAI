@@ -51,18 +51,19 @@
     {% endif %}
 
     <div class="cover-container d-flex h-75 p-3 mx-auto flex-column">
-      <header class="masthead mb-auto">
+      <div class="masthead mb-auto">
         <div class="inner">
           <a href="{% url 'accueil' %}"
-            ><img src="{% static 'img/vdl.jpg' %}" class="rounded"
+            ><img src="{% static 'img/img.png' %}" class="imagesize"
           /></a>
+          <br />
           <nav class="nav nav-masthead justify-content-center">
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <a class="nav-link active" href="#">Authentification</a>
           </nav>
         </div>
-      </header>
+      </div>
 
+      <br />
       <div class="card shadow-lg card-login">
         <div class="card-body p-5" style="text-align: left">
           <form
@@ -73,7 +74,7 @@
           >
             {% csrf_token %}
             <div class="mb-3">
-              <label class="mb-2" for="email">Identifiant AD :</label>
+              <label class="mb-2" for="email">Identifiant :</label>
               <input
                 id="username"
                 type="text"
