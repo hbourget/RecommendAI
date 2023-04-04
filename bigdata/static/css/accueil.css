@@ -86,6 +86,10 @@ body {
   font-weight: 700;
 }
 
+.datasetState{
+  color:red;
+}
+
 
 /*
  * Footer

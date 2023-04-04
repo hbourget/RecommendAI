@@ -14,18 +14,29 @@ import random
 def accueil_view(request):
     if not request.user.is_authenticated:
         return redirect('login')
-    imgList = ['static/img/poulpe.png', 'static/img/croix.png', 'static/img/img.png']
-    random_img = random.choice(imgList)
-    if request.method == 'POST':
+    imgList = [#'static/img/poulpe.png', 'static/img/croix.png', 'static/img/img.png'
+        ]
+    if  len(imgList) == 0:
+        status = 0
+        random_img = None
+    else:
+        status = 1
+        random_img = random.choice(imgList)
 
+    if request.method == 'POST':
         if request.POST.get('like') == '1':
             print("Bonjour")
-            
         elif request.POST.get('like') == '0':
             print("au revoir")
-
-    context = {'random_img': random_img}
+    context = {'random_img': random_img, 'status': status}
     return render(request, 'accueil.html', context)
+
+def dataset_view(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    print("Telechargement")
+    return redirect('accueil')
 
 def login_view(request):
     statusLog = None

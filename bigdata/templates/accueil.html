@@ -63,7 +63,7 @@
       </div>
     </div>
     <div class="cover-container p-3 mx-auto flex-column">
-      <header class="masthead mb-auto">
+      <div class="masthead mb-auto">
         <div class="inner">
           <a href="{% url 'accueil' %}"
             ><img src="{% static 'img/img.png' %}" class="rounded"
@@ -83,12 +83,21 @@
           </nav>
         </div>
         <br />
-      </header>
+      </div>
 
-      <button type="submit" name="datatset" class="btn btn-primary" value="1">
-        Télécharger le dataset
-      </button>
+  {% if status == 0 %}
+    <form method="POST" action="{% url 'dataset' %}" >
+      {% csrf_token %}
+      <div class="datasetState">Aucune image
+        <br>
+        <br>
+        <button type="submit" name="dataset" class="btn btn-primary" value="0">
+          Télécharger le dataset
+        </button>
+      </div>
+    </form>
 
+  {% else %}
       <form method="POST">
         {% csrf_token %}
         <img class="image" src="{{ random_img }}" style="width: 400px" />
@@ -101,6 +110,7 @@
           Like
         </button>
       </form>
+  {% endif %}
 
     </body>
 
