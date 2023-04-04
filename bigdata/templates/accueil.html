@@ -100,7 +100,7 @@
   {% else %}
       <form method="POST">
         {% csrf_token %}
-        <img class="image" src="{{ random_img }}" style="width: 400px" />
+        <img src="{{ random_img }}" style="width: 400px" />
         <br />
         <br />
         <button type="submit" name="like" class="btn btn-danger" value="0">

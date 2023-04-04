@@ -14,7 +14,7 @@ import random
 def accueil_view(request):
     if not request.user.is_authenticated:
         return redirect('login')
-    imgList = [#'static/img/poulpe.png', 'static/img/croix.png', 'static/img/img.png'
+    imgList = ['static/img/poulpe.png', 'static/img/croix.png', 'static/img/img.png'
         ]
     if  len(imgList) == 0:
         status = 0
