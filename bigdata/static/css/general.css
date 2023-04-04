@@ -1,0 +1,28 @@
+.btn-success {
+    transition: 0.3s;
+}
+
+.btn-primary {
+    transition: 0.3s;
+}
+
+.btn-secondary {
+    transition: 0.3s;
+}
+
+.nav-link {
+    transition: 0.3s;
+}
+
+.toast {
+    transition: 0.1s;
+}
+
+.code {
+    width: 247px;
+    margin: auto
+}
+
+.marge-gauche-20px {
+    margin-left: 20px
+}
