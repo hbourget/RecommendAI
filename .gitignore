@@ -1,7 +1,3 @@
-images/
-unsplash-research-dataset-lite-latest/
-unsplash-research-dataset-lite-latest.zip
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
