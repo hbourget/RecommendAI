@@ -82,32 +82,24 @@
             ></a>
           </nav>
         </div>
+        <br />
       </header>
-      <br />
-      <br />
-      <br />
-      <main role="main" class="inner cover">
-        <h1 class="cover-heading">Application bigdata.</h1>
-        <p class="lead">
-          Vous êtes connecté en tant que
-          <b>{{user.last_name}} {{user.first_name}}<br</b>.
-          <br />
-          <br />
-          <a
-            href="{% url 'logout' %}"
-            class="btn btn-secondary shadow-lg"
-            role="button"
-            aria-disabled="true"
-            >Deconnexion
-          </a>
-        </p>
-      </main>
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
+
+      <form method="POST">
+        {% csrf_token %}
+        <img class="image" src="{{ random_img }}" style="width: 400px" />
+        <br />
+        <br />
+        <button type="submit" name="like" class="btn btn-danger" value="0">
+          Dislike
+        </button>
+        <button type="submit" name="like" class="btn btn-success" value="1">
+          Like
+        </button>
+      </form>
+
+    </body>
+
       <footer class="mastfoot mt-auto">
         <div class="inner">
           <p>
@@ -118,5 +110,4 @@
       </footer>
     </div>
     {% endblock content %}
-  </body>
 </html>

@@ -9,7 +9,6 @@ a:hover {
   color: #fff;
 }
 
-
 /*
  * Base structure
  */
@@ -70,6 +69,10 @@ body {
   border-bottom-color: #fff;
 }
 
+.image {
+  width: 150px;
+  height: 150px;
+}
 
 
 /*
@@ -89,9 +92,34 @@ body {
  */
 .mastfoot {
   color: rgba(255, 255, 255, .5);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
 }
 
 .card-login {
   background-color: #555 !important;
   color: #fff;
+}
+
+
+
+/*
+ * Profile
+ */
+ table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  text-align: left;
+  padding: 8px;
+}
+
+th {
+  background-color: black;
+  font-weight: bold;
 }
