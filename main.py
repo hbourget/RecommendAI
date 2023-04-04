@@ -1,5 +1,4 @@
 import csv
-import json
 import os
 import urllib.request
 import zipfile
@@ -25,7 +24,7 @@ def download_and_extract_data(url, folder_name, file_name):
 
 
 def download_images(data, nb_images):
-    dir_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "images")
+    dir_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "bigdata/bigdata_app/data/images")
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
 
