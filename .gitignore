@@ -1,6 +1,4 @@
-bigdata/bigdata_app/data/unsplash-research-dataset-lite-latest.zip
-bigdata/bigdata_app/data/unsplash-research-dataset-lite-latest
-bigdata/bigdata_app/data/images/
+bigdata/bigdata_app/data/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
