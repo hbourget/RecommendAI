@@ -128,7 +128,7 @@ def get_photo_image_url(filename):
         return ""
 
 
-def get_dominant_colors():
+def write_dominant_colors_data_to_json():
     input_dir = '../data/images/'
     output_file = '../data/dominant_colors.json'
 
@@ -171,4 +171,4 @@ if __name__ == '__main__':
     print('Writing EXIF data to JSON file...')
     write_exif_data_to_json()
     print('Adding color data to JSON file...')
-    get_dominant_colors()
+    write_dominant_colors_data_to_json()
