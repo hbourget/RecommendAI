@@ -74,6 +74,11 @@ body {
   height: 150px;
 }
 
+.fontsize{
+  font-size: 0.8em;
+  font-weight: bold;
+}
+
 
 /*
  * Cover

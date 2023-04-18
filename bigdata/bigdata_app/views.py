@@ -10,18 +10,24 @@ from django.contrib.auth import authenticate, logout, login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.staticfiles.storage import staticfiles_storage
 import random
+import os
+
+from .download_dataset import *
+
 
 def accueil_view(request):
     if not request.user.is_authenticated:
         return redirect('login')
-    imgList = ['static/img/poulpe.png', 'static/img/croix.png', 'static/img/img.png'
-        ]
-    if  len(imgList) == 0:
+
+    if not os.path.exists(download_dir):
+        os.mkdir(download_dir)
+
+    if len(os.listdir(download_dir)) == 0:
         status = 0
         random_img = None
     else:
         status = 1
-        random_img = random.choice(imgList)
+        random_img = random.choice(os.listdir(download_dir))
 
     if request.method == 'POST':
         if request.POST.get('like') == '1':
@@ -31,12 +37,14 @@ def accueil_view(request):
     context = {'random_img': random_img, 'status': status}
     return render(request, 'accueil.html', context)
 
+
 def dataset_view(request):
     if not request.user.is_authenticated:
         return redirect('login')
-    
-    print("Telechargement")
-    return redirect('accueil')
+
+    download_unsplash_dataset(download_dir)
+    return render(request, 'dataset.html')
+
 
 def login_view(request):
     statusLog = None
@@ -60,15 +68,17 @@ def login_view(request):
         form = AuthenticationForm()
     return render(request, 'login.html')
 
+
 def logout_view(request):
     if not request.user.is_authenticated:
         return redirect('login')
     else:
         logout(request)
         return redirect('login')
-    
+
+
 def profile_view(request):
     if not request.user.is_authenticated:
-        #return redirect('login')
+        # return redirect('login')
         pass
     return render(request, 'profile.html')

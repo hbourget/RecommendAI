@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Dossier images dataset
+unsplash_dataset
+
 # C extensions
 *.so
 

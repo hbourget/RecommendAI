@@ -65,9 +65,9 @@
     <div class="cover-container p-3 mx-auto flex-column">
       <div class="masthead mb-auto">
         <div class="inner">
-          <a href="{% url 'accueil' %}"
-            ><img src="{% static 'img/img.png' %}" class="rounded"
-          /></a>
+          <a href="{% url 'accueil' %}">
+            <img src="{% static 'img/img.png' %}" class="rounded"/>
+          </a>
           <nav
             class="nav nav-masthead justify-content-center"
             style="margin-top: 20px"
@@ -96,6 +96,7 @@
         </button>
       </div>
     </form>
+    <i class="fontsize">(~3 min)</i>
 
   {% else %}
       <form method="POST">
