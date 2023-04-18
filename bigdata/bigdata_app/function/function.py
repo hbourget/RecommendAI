@@ -1,41 +1,72 @@
-import os
 import csv
 import urllib.request
 import zipfile
+import os
 import json
+import numpy as np
 import exifread
-from PIL import Image
+from keras.applications import EfficientNetB0
+from keras.utils import load_img, img_to_array
+from tensorflow.keras.applications.resnet50 import ResNet50, preprocess_input, decode_predictions
+
+input_file = '../data/unsplash-research-dataset-lite-latest/photos.tsv000'
+output_dir = '../data/images/'
+url = 'https://unsplash.com/data/lite/latest'
+zip_file = '../data/unsplash-research-dataset-lite-latest.zip'
+extract_dir = '../data/unsplash-research-dataset-lite-latest'
 
 
-def download_unsplash_dataset():
-    url = 'https://unsplash.com/data/lite/latest'
-    zip_file = '../data/unsplash-research-dataset-lite-latest.zip'
-    extract_dir = '../data/unsplash-research-dataset-lite-latest'
-
+def download_unsplash_dataset(url, zip_file, extract_dir):
+    # Check if the extract directory already exists
     if os.path.isdir(extract_dir):
         print(f'Unsplash dataset is already extracted in {extract_dir}')
         return
 
+    # Check if the zip file exists and is not empty
     if not os.path.exists(zip_file):
         print('Downloading Unsplash dataset...')
         urllib.request.urlretrieve(url, zip_file)
+    elif os.path.getsize(zip_file) == 0:
+        os.remove(zip_file)
+        print(f'Removing empty zip file {zip_file}')
+        print('Downloading Unsplash dataset...')
+        urllib.request.urlretrieve(url, zip_file)
+    else:
+        print(f'Zip file {zip_file} already exists and is not empty.')
 
-    with zipfile.ZipFile(zip_file) as zf:
-        zf.extractall(extract_dir)
+    # Extract the zip file
+    if os.path.exists(zip_file):
+        with zipfile.ZipFile(zip_file) as zf:
+            zf.extractall(extract_dir)
 
-    print(f'Unsplash dataset extracted to {extract_dir}')
+        print(f'Unsplash dataset extracted to {extract_dir}')
+    else:
+        print(f'Zip file {zip_file} does not exist.')
 
 
-def download_images(num_images):
-    input_file = '../data/unsplash-research-dataset-lite-latest/photos.tsv000'
-    output_dir = '../data/images/'
+def download_images(input_file, output_dir, num_images):
+    # Check if the output directory exists
+    if not os.path.isdir(output_dir):
+        os.mkdir(output_dir)
 
+    # Check if the input file exists
+    if not os.path.exists(input_file):
+        print(f'Input file {input_file} does not exist.')
+        return
+
+    # Check if the input file is not empty
+    if os.path.getsize(input_file) == 0:
+        print(f'Input file {input_file} is empty.')
+        return
+
+    # Check if the specified number of images has already been downloaded
     downloaded_images = [f for f in os.listdir(output_dir) if
                          f.endswith('.jpg') or f.endswith('.jpeg') or f.endswith('.png')]
     if len(downloaded_images) >= num_images:
         print(f"The output directory {output_dir} already contains at least {num_images} images.")
         return
 
+    # Download the images
     with open(input_file, 'r', encoding='utf-8') as f:
         reader = csv.DictReader(f, delimiter='\t')
 
@@ -47,6 +78,7 @@ def download_images(num_images):
                 image_url = row['photo_image_url']
                 image_path = os.path.join(output_dir, f"{row['photo_id']}.jpg")
 
+                # Check if the image has already been downloaded
                 if os.path.exists(image_path):
                     continue
 
@@ -56,119 +88,90 @@ def download_images(num_images):
             except Exception as e:
                 print(f"Failed to download image {i + 1}: {str(e)}")
 
+    # Count the number of downloaded images
     downloaded_images = [f for f in os.listdir(output_dir) if
                          f.endswith('.jpg') or f.endswith('.jpeg') or f.endswith('.png')]
     num_downloaded_images = len(downloaded_images)
     print(f"Downloaded a total of {num_downloaded_images} images.")
 
+    # Check if any images were downloaded
+    if num_downloaded_images == 0:
+        print('No images were downloaded.')
 
-def write_exif_data_to_json():
-    input_dir = '../data/images/'
-    output_file = '../data/exif_data.json'
 
+# Cache for the model
+model_cache = None
+
+# Load and cache the model
+def load_model():
+    global model_cache
+    if model_cache is None:
+        model_cache = EfficientNetB0(weights='imagenet')
+    return model_cache
+
+# Classify an image
+def classify_image(image_path):
+    # Load and preprocess the image
+    img = load_img(image_path, target_size=(224, 224))
+    x = img_to_array(img)
+    x = np.expand_dims(x, axis=0)
+    x = preprocess_input(x)
+
+    # Use the model to classify the image
+    model = load_model()
+    preds = model.predict(x)
+    decoded_preds = decode_predictions(preds, top=10)[0]
+
+    # Return a list of tags
+    tags = [pred[1] for pred in decoded_preds]
+    return tags
+
+
+def extract_image_metadata(input_dir, output_file):
+    # Check if the input directory exists
+    if not os.path.isdir(input_dir):
+        print(f'Input directory {input_dir} does not exist.')
+        return
+
+    # Check if the output file exists
     if os.path.exists(output_file):
-        with open(output_file, 'r', encoding='utf-8') as f:
-            existing_data = json.load(f)
-        existing_ids = [existing_data[filename]['id'] for filename in existing_data]
-        last_id = max(existing_ids) if existing_ids else 0
-    else:
-        existing_data = {}
-        last_id = 0
+        print(f'Output file {output_file} already exists.')
+        return
 
-    new_data = {}
-    for filename in os.listdir(input_dir):
-        if not filename.lower().endswith(('.jpg', '.jpeg')):
-            continue
+    # Extract metadata from images
+    metadata = []
+    for file in os.listdir(input_dir):
+        if file.endswith('.jpg') or file.endswith('.jpeg') or file.endswith('.png'):
+            file_path = os.path.join(input_dir, file)
+            try:
+                with open(file_path, 'rb') as f:
+                    tags = classify_image(file_path)
+                    exif_tags = exifread.process_file(f, details=False, stop_tag='UNDEF')
+                    metadata.append({
+                        'filename': file,
+                        'tags': {str(tag): str(value) for tag, value in exif_tags.items() if tag != 'JPEGThumbnail'},
+                        'image_tags': tags
+                    })
+            except Exception as e:
+                print(f"Failed to extract metadata from {file}: {str(e)}")
 
-        try:
-            if filename in existing_data:
-                continue
-
-            file_path = os.path.join(input_dir, filename)
-            with open(file_path, 'rb') as f:
-                tags = exifread.process_file(f)
-
-            exif_dict = {str(tag): str(value) for tag, value in tags.items() if str(tag) != 'JPEGThumbnail'}
-
-            new_data[filename] = {
-                'id': last_id + 1,
-                'filename': filename,
-                'photo_image_url': get_photo_image_url(filename),
-                'exif_data': exif_dict
-            }
-            last_id += 1
-
-            print(f"Processed image {filename}")
-        except Exception as e:
-            print(f"Failed to process image {filename}: {str(e)}")
-
-    all_data = {**existing_data, **new_data}
+    # Write metadata to output file
     with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump(all_data, f, indent=4)
+        json.dump(metadata, f, indent=4)
 
-    num_new_images = len(new_data)
-    num_existing_images = len(existing_data)
-    total_images = num_new_images + num_existing_images
-    if num_new_images > 0:
-        print(f"Processed a total of {total_images} images. Added {num_new_images} new images to {output_file}.")
-    else:
-        print(f"Processed a total of {total_images} images. All EXIF data already exists in {output_file}.")
+    print(f"Metadata extracted from {len(metadata)} images and saved to {output_file}")
 
-
-def get_photo_image_url(filename):
-    # Open the input file and read the CSV data
-    input_file_path = '../data/unsplash-research-dataset-lite-latest/photos.tsv000'
-    with open(input_file_path, 'r', encoding='utf-8') as f:
-        reader = csv.DictReader(f, delimiter='\t')
-
-        # Loop over the rows of the CSV data
-        for row in reader:
-            if row['photo_id'] == os.path.splitext(filename)[0]:
-                return row['photo_image_url']
-        return ""
-
-
-def write_dominant_colors_data_to_json():
-    input_dir = '../data/images/'
-    output_file = '../data/dominant_colors.json'
-
-    dominant_colors = {}
-    for filename in os.listdir(input_dir):
-        if not filename.lower().endswith(('.jpg', '.jpeg', '.png')):
-            continue
-
-        try:
-            file_path = os.path.join(input_dir, filename)
-            with Image.open(file_path) as img:
-                img = img.convert('RGB')
-                img = img.resize((50, 50))
-
-                colors = img.getcolors(50 * 50)
-                max_occurence, most_present = 0, 0
-                for c in colors:
-                    if c[0] > max_occurence:
-                        (max_occurence, most_present) = c
-                rgb = (int(most_present[0]), int(most_present[1]), int(most_present[2]))
-
-            dominant_colors[filename] = rgb
-
-            print(f"Processed image {filename}")
-        except Exception as e:
-            print(f"Failed to process image {filename}: {str(e)}")
-
-    with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump(dominant_colors, f, indent=4)
-
-    num_processed_images = len(dominant_colors)
-    print(f"Processed a total of {num_processed_images} images. Wrote the dominant colors to {output_file}.")
 
 
 if __name__ == '__main__':
-    print('Downloading and extracting the Unsplash dataset...')
-    download_unsplash_dataset()
-    print('Downloading images...')
-    download_images(500)  # set nb images to download
-    print('Writing EXIF data to JSON file...')
-    write_exif_data_to_json()
-    print('Adding color data to JSON file...')
-    write_dominant_colors_data_to_json()
+    # Download the Unsplash dataset
+    download_unsplash_dataset(url, zip_file, extract_dir)
+
+    # Download the images
+    num_images = 500
+    download_images(input_file, output_dir, num_images)
+
+    # Extract metadata from the images
+    input_dir = '../data/images/'
+    output_file = '../data/metadata.json'
+    extract_image_metadata(input_dir, output_file)
