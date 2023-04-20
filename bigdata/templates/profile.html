@@ -2,127 +2,97 @@
 {% load static %}
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>ADM | Profil</title>
-    <link
-      rel="icon"
-      type="image/x-icon"
-      href="{% static 'img/favicon.png' %}"
-    />
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
-    <link rel="stylesheet" href="{% static 'css/general.css' %}" />
-    <link rel="stylesheet" href="{% static 'css/accueil.css' %}" />
 
-    <link
-      href="{% static 'fontawesomefree/css/fontawesome.css' %}"
-      rel="stylesheet"
-      type="text/css"
-    />
-    <link
-      href="{% static 'fontawesomefree/css/brands.css' %}"
-      rel="stylesheet"
-      type="text/css"
-    />
-    <link
-      href="{% static 'fontawesomefree/css/solid.css' %}"
-      rel="stylesheet"
-      type="text/css"
-    />
-    <script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>
-    <link
-      href="{% static 'fontawesomefree/css/all.min.css' %}"
-      rel="stylesheet"
-      type="text/css"
-    />
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
-  </head>
-  <body class="text-center">
-    {% block content %}
-    <div
-      class="toast align-items-center text-white bg-danger mr-4 mt-3"
-      id="toastSendOK"
-      data-autohide="false"
-      role="alert"
-      aria-live="assertive"
-      aria-atomic="true"
-      style="
+<head>
+  <title>ADM | Profil</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.png' %}" />
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/general.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/accueil.css' %}" />
+
+  <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css" />
+  <link href="{% static 'fontawesomefree/css/brands.css' %}" rel="stylesheet" type="text/css" />
+  <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css" />
+  <script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>
+  <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet" type="text/css" />
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.24/datatables.min.css" />
+  <script src="{% static 'js/bootstrap.min.js' %}"></script>
+</head>
+
+<body class="text-center">
+  {% block content %}
+  <div class="toast align-items-center text-white bg-danger mr-4 mt-3" id="toastSendOK" data-autohide="false"
+    role="alert" aria-live="assertive" aria-atomic="true" style="
         position: absolute;
         top: 0;
         right: 0;
         z-index: 2;
         margin-right: 15px;
-      "
-    >
-      <div class="d-flex">
-        <div class="toast-body"></div>
-        <button
-          type="button"
-          class="btn-close me-2 m-auto"
-          data-bs-dismiss="toast"
-          aria-label="Close"
-        ></button>
-      </div>
+      ">
+    <div class="d-flex">
+      <div class="toast-body"></div>
+      <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
     </div>
-    <div class="cover-container p-3 mx-auto flex-column">
-      <header class="masthead mb-auto">
-        <div class="inner">
-          <a href="{% url 'accueil' %}"
-            ><img src="{% static 'img/img.png' %}" class="rounded"
-          /></a>
-          <nav
-            class="nav nav-masthead justify-content-center"
-            style="margin-top: 20px"
-          >
-            <a class="nav-link" href="{% url 'accueil' %}">Accueil</a>
-            <a class="nav-link active" href="{% url 'profile' %}">Mon profil</a>
-            <a class="nav-link" href="{% url 'logout' %}"
-              ><i
-                class="fa-solid fa-right-from-bracket"
-                style="color: #e04848"
-              ></i
-            ></a>
-          </nav>
-        </div>
-        <p class="lead">
-          Vous êtes connecté en tant que
-          <b>{{user.last_name}} {{user.first_name}}</b>.
-        </p>
-      </header>
-
-      <p class="lead">
-        <a
-          href="{% url 'logout' %}"
-          class="btn btn-secondary shadow-lg"
-          role="button"
-          aria-disabled="true"
-          >Deconnexion
+  </div>
+  <div class="container">
+    <header class="masthead mb-auto">
+      <div class="inner">
+        <a href="{% url 'accueil' %}"><img src="{% static 'img/img.png' %}" class="rounded" />
         </a>
+        <nav class="nav nav-masthead justify-content-center" style="margin-top: 20px">
+          <a class="nav-link" href="{% url 'accueil' %}">Accueil</a>
+          <a class="nav-link active" href="{% url 'profile' %}">Mon profil</a>
+          <a class="nav-link" href="{% url 'logout' %}"><i class="fa-solid fa-right-from-bracket"
+              style="color: #e04848"></i></a>
+        </nav>
+      </div>
+      <p class="lead">
+        Vous êtes connecté en tant que
+        <b>{{user.last_name}} {{user.first_name}}</b>.
       </p>
+    </header>
 
-      <br />
-      <br />
-      <br />
+    <p class="lead">
+      <a href="{% url 'logout' %}" class="btn btn-secondary shadow-lg" role="button" aria-disabled="true">Deconnexion
+      </a>
+    </p>
 
-      <table>
+    <br />
+    <br />
+    <br />
+
+    <table id="myTable" class="table table-striped table-bordered" style="width:100%; background-color:#989898">
+      <thead>
         <tr>
-          <th>Data</th>
-          <th>Valeurs</th>
+          <th>Nom</th>
+          <th>Âge</th>
+          <th>Ville</th>
         </tr>
-        <tr>
-          <td>Paramètre 1</td>
-          <td>Valeur 1</td>
-        </tr>
-      </table>
-    </body>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
 
-      <footer class="mastfoot mt-auto">
-        <div class="inner">
-          <p>
-            Application projet BigData - Hugo BOURGET, Maxime BENUCCI, Vincent
-            CADORET.
-          </p>
-        </div>
-      </footer>
-    </div>
+    <footer class="mastfoot mt-auto">
+      <div class="inner">
+        <p>
+          Application projet BigData - Hugo BOURGET, Maxime BENUCCI, Vincent
+          CADORET.
+        </p>
+      </div>
+    </footer>
     {% endblock content %}
+
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.24/datatables.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $('#myTable').DataTable();
+      });
+    </script>
+
+  </div>
+</body>
+
 </html>

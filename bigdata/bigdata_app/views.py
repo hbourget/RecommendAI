@@ -10,33 +10,56 @@ from django.contrib.auth import authenticate, logout, login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.staticfiles.storage import staticfiles_storage
 import random
+import os
+import csv
+
+
+from .download_dataset import *
+
+
+def randomURL(random_line):
+    with open("unsplash_dataset/photos.tsv000", "r", encoding="utf-8") as f:
+        reader = csv.reader(f, delimiter="\t")
+        # Itération sur chaque ligne du fichier
+        for i, row in enumerate(reader):
+            if i == random_line:
+                url = row[2]
+                print(url)
+
+    return url
+
 
 def accueil_view(request):
     if not request.user.is_authenticated:
         return redirect('login')
-    imgList = ['static/img/poulpe.png', 'static/img/croix.png', 'static/img/img.png'
-        ]
-    if  len(imgList) == 0:
+
+    if not os.path.exists(download_dir):
+        os.mkdir(download_dir)
+
+    if len(os.listdir(download_dir)) == 0:
         status = 0
-        random_img = None
+        url_image = None
     else:
         status = 1
-        random_img = random.choice(imgList)
+        randomNumber = random.randint(0, 20000)
+        url_image = randomURL(randomNumber)
 
     if request.method == 'POST':
         if request.POST.get('like') == '1':
             print("Bonjour")
         elif request.POST.get('like') == '0':
             print("au revoir")
-    context = {'random_img': random_img, 'status': status}
+    context = {'status': status, 'url_image': url_image}
     return render(request, 'accueil.html', context)
+
 
 def dataset_view(request):
     if not request.user.is_authenticated:
         return redirect('login')
-    
-    print("Telechargement")
-    return redirect('accueil')
+
+    download_unsplash_dataset(download_dir)
+    return render(request, 'acceuil.html')
+
 
 def login_view(request):
     statusLog = None
@@ -60,15 +83,17 @@ def login_view(request):
         form = AuthenticationForm()
     return render(request, 'login.html')
 
+
 def logout_view(request):
     if not request.user.is_authenticated:
         return redirect('login')
     else:
         logout(request)
         return redirect('login')
-    
+
+
 def profile_view(request):
     if not request.user.is_authenticated:
-        #return redirect('login')
+        # return redirect('login')
         pass
     return render(request, 'profile.html')
