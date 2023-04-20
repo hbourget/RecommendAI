@@ -2,91 +2,56 @@
 {% load static %}
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>ADM | Accueil</title>
-    <link
-      rel="icon"
-      type="image/x-icon"
-      href="{% static 'img/favicon.png' %}"
-    />
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
-    <link rel="stylesheet" href="{% static 'css/general.css' %}" />
-    <link rel="stylesheet" href="{% static 'css/accueil.css' %}" />
-    <link
-      href="{% static 'fontawesomefree/css/fontawesome.css' %}"
-      rel="stylesheet"
-      type="text/css"
-    />
-    <link
-      href="{% static 'fontawesomefree/css/brands.css' %}"
-      rel="stylesheet"
-      type="text/css"
-    />
-    <link
-      href="{% static 'fontawesomefree/css/solid.css' %}"
-      rel="stylesheet"
-      type="text/css"
-    />
-    <script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>
-    <link
-      href="{% static 'fontawesomefree/css/all.min.css' %}"
-      rel="stylesheet"
-      type="text/css"
-    />
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
-  </head>
-  <body class="text-center">
-    {% block content %}
-    <div
-      class="toast align-items-center text-white bg-danger mr-4 mt-3"
-      id="toastSendOK"
-      data-autohide="false"
-      role="alert"
-      aria-live="assertive"
-      aria-atomic="true"
-      style="
+
+<head>
+  <title>ADM | Accueil</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.png' %}" />
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/general.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/accueil.css' %}" />
+  <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css" />
+  <link href="{% static 'fontawesomefree/css/brands.css' %}" rel="stylesheet" type="text/css" />
+  <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css" />
+  <script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>
+  <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet" type="text/css" />
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.24/datatables.min.css" />
+  <script src="{% static 'js/bootstrap.min.js' %}"></script>
+</head>
+
+<body class="text-center">
+  {% block content %}
+  <div class="toast align-items-center text-white bg-danger mr-4 mt-3" id="toastSendOK" data-autohide="false"
+    role="alert" aria-live="assertive" aria-atomic="true" style="
         position: absolute;
         top: 0;
         right: 0;
         z-index: 2;
         margin-right: 15px;
-      "
-    >
-      <div class="d-flex">
-        <div class="toast-body"></div>
-        <button
-          type="button"
-          class="btn-close me-2 m-auto"
-          data-bs-dismiss="toast"
-          aria-label="Close"
-        ></button>
-      </div>
+      ">
+    <div class="d-flex">
+      <div class="toast-body"></div>
+      <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
     </div>
-    <div class="cover-container p-3 mx-auto flex-column">
-      <div class="masthead mb-auto">
-        <div class="inner">
-          <a href="{% url 'accueil' %}">
-            <img src="{% static 'img/img.png' %}" class="rounded"/>
-          </a>
-          <nav
-            class="nav nav-masthead justify-content-center"
-            style="margin-top: 20px"
-          >
-            <a class="nav-link active" href="{% url 'accueil' %}">Accueil</a>
-            <a class="nav-link" href="{% url 'profile' %}">Mon profil</a>
-            <a class="nav-link" href="{% url 'logout' %}"
-              ><i
-                class="fa-solid fa-right-from-bracket"
-                style="color: #e04848"
-              ></i
-            ></a>
-          </nav>
-        </div>
-        <br />
+  </div>
+  <div class="container">
+    <!-- container p-3 mx-auto flex-column -->
+    <div class=" masthead mb-auto">
+      <div class="inner">
+        <a href="{% url 'accueil' %}">
+          <img src="{% static 'img/img.png' %}" class="rounded" />
+        </a>
+        <nav class="nav nav-masthead justify-content-center" style="margin-top: 20px">
+          <a class="nav-link active" href="{% url 'accueil' %}">Accueil</a>
+          <a class="nav-link" href="{% url 'profile' %}">Mon profil</a>
+          <a class="nav-link" href="{% url 'logout' %}"><i class="fa-solid fa-right-from-bracket"
+              style="color: #e04848"></i></a>
+        </nav>
       </div>
+      <br />
+    </div>
 
-  {% if status == 0 %}
-    <form method="POST" action="{% url 'dataset' %}" >
+    {% if status == 0 %}
+    <form method="POST" action="{% url 'dataset' %}">
       {% csrf_token %}
       <div class="datasetState">Aucune image
         <br>
@@ -98,31 +63,38 @@
     </form>
     <i class="fontsize">(~3 min)</i>
 
-  {% else %}
-      <form method="POST">
-        {% csrf_token %}
-        <img src="{{ random_img }}" style="width: 400px" />
-        <br />
-        <br />
-        <button type="submit" name="like" class="btn btn-danger" value="0">
-          Dislike
-        </button>
-        <button type="submit" name="like" class="btn btn-success" value="1">
-          Like
-        </button>
-      </form>
-  {% endif %}
+    {% else %}
 
-    </body>
 
-      <footer class="mastfoot mt-auto">
-        <div class="inner">
-          <p>
-            Application projet BigData - Hugo BOURGET, Maxime BENUCCI, Vincent
-            CADORET.
-          </p>
-        </div>
-      </footer>
+    <div class="container dimension">
+      <img src="{{ url_image }}" class="imagee" />
     </div>
+
+    <form method="POST">
+      {% csrf_token %}
+      <br />
+      <br />
+      <button type="submit" name="like" class="btn btn-danger" value="0">
+        Dislike
+      </button>
+      <button type="submit" name="like" class="btn btn-success" value="1">
+        Like
+      </button>
+    </form>
+    {% endif %}
+
+
+    <footer class="mastfoot mt-auto">
+      <div class="inner">
+        <p>
+          Application projet BigData - Hugo BOURGET, Maxime BENUCCI, Vincent
+          CADORET.
+        </p>
+      </div>
+    </footer>
     {% endblock content %}
+  </div>
+
+</body>
+
 </html>

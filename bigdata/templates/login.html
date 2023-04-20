@@ -2,126 +2,89 @@
 {% load static %}
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>ADM | Connexion</title>
-    <link
-      rel="icon"
-      type="image/x-icon"
-      href="{% static 'img/favicon.png' %}"
-    />
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
-    <link rel="stylesheet" href="{% static 'css/login.css' %}" />
-    <link rel="stylesheet" href="{% static 'css/general.css' %}" />
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
-  </head>
-  <body class="text-center">
-    {% block content %} {% if statusLog == 0 %}
-    <div
-      class="toast align-items-center text-white bg-danger mr-4 mt-3"
-      id="toastSendOK"
-      data-autohide="false"
-      role="alert"
-      aria-live="assertive"
-      aria-atomic="true"
-      style="
+
+<head>
+  <title>ADM | Connexion</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.png' %}" />
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/login.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/general.css' %}" />
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.24/datatables.min.css" />
+  <script src="{% static 'js/bootstrap.min.js' %}"></script>
+</head>
+
+<body class="text-center">
+  {% block content %} {% if statusLog == 0 %}
+  <div class="toast align-items-center text-white bg-danger mr-4 mt-3" id="toastSendOK" data-autohide="false"
+    role="alert" aria-live="assertive" aria-atomic="true" style="
         position: absolute;
         top: 0;
         right: 0;
         z-index: 2;
         margin-right: 15px;
-      "
-    >
-      <div class="d-flex">
-        <div class="toast-body">{{stringMessageLog}}</div>
-        <button
-          type="button"
-          class="btn-close me-2 m-auto"
-          data-bs-dismiss="toast"
-          aria-label="Close"
-        ></button>
+      ">
+    <div class="d-flex">
+      <div class="toast-body">{{stringMessageLog}}</div>
+      <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+  <script>
+    window.onload = (event) => {
+      let myAlert = document.getElementById("toastSendOK");
+      let bsAlert = new bootstrap.Toast(myAlert);
+      bsAlert.show();
+    };
+  </script>
+  {% endif %}
+
+  <div class="cover-container d-flex h-75 p-3 mx-auto flex-column">
+    <div class="masthead mb-auto">
+      <div class="inner">
+        <a href="{% url 'accueil' %}"></a>
+        <img src="{% static 'img/img.png' %}" class="rounded" /></a>
+        <br />
+        <nav class="nav nav-masthead justify-content-center">
+          <a class="nav-link active" href="#">Authentification</a>
+        </nav>
       </div>
     </div>
-    <script>
-      window.onload = (event) => {
-        let myAlert = document.getElementById("toastSendOK");
-        let bsAlert = new bootstrap.Toast(myAlert);
-        bsAlert.show();
-      };
-    </script>
-    {% endif %}
 
-    <div class="cover-container d-flex h-75 p-3 mx-auto flex-column">
-      <div class="masthead mb-auto">
-        <div class="inner">
-          <a href="{% url 'accueil' %}"></a>
-            <img src="{% static 'img/img.png' %}" class="rounded" /></a
-          >
+    <br />
+    <div class="card shadow-lg card-login">
+      <div class="card-body p-5" style="text-align: left">
+        <form method="post" novalidate="" autocomplete="off" action="{% url 'login' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="mb-2" for="email">Identifiant :</label>
+            <input id="username" type="text" class="form-control" name="username" placeholder="Login01"
+              autocomplete="off" required autofocus />
+          </div>
+
+          <div class="mb-3">
+            <div class="mb-2 w-100">
+              <label for="password">Mot de passe :</label>
+            </div>
+            <input id="password" type="password" class="form-control" name="password" placeholder="********" required />
+          </div>
           <br />
-          <nav class="nav nav-masthead justify-content-center">
-            <a class="nav-link active" href="#">Authentification</a>
-          </nav>
-        </div>
+          <div class="d-flex align-items-center">
+            <button type="submit" class="btn btn-primary" style="margin: auto">
+              Se connecter
+            </button>
+          </div>
+        </form>
       </div>
-
-      <br />
-      <div class="card shadow-lg card-login">
-        <div class="card-body p-5" style="text-align: left">
-          <form
-            method="post"
-            novalidate=""
-            autocomplete="off"
-            action="{% url 'login' %}"
-          >
-            {% csrf_token %}
-            <div class="mb-3">
-              <label class="mb-2" for="email">Identifiant :</label>
-              <input
-                id="username"
-                type="text"
-                class="form-control"
-                name="username"
-                placeholder="Login01"
-                autocomplete="off"
-                required
-                autofocus
-              />
-            </div>
-
-            <div class="mb-3">
-              <div class="mb-2 w-100">
-                <label for="password">Mot de passe :</label>
-              </div>
-              <input
-                id="password"
-                type="password"
-                class="form-control"
-                name="password"
-                placeholder="********"
-                required
-              />
-            </div>
-            <br />
-            <div class="d-flex align-items-center">
-              <button
-                type="submit"
-                class="btn btn-primary"
-                style="margin: auto"
-              >
-                Se connecter
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <footer class="mastfoot mt-auto">
-        <div class="inner">
-          <p>
-            Application Bigdata - Hugo BOURGET, Maxime BENUCCI, Vincent CADORET.
-          </p>
-        </div>
-      </footer>
     </div>
+
+    <footer class="mastfoot mt-auto">
+      <div class="inner">
+        <p>
+          Application Bigdata - Hugo BOURGET, Maxime BENUCCI, Vincent CADORET.
+        </p>
+      </div>
+    </footer>
     {% endblock content %}
-  </body>
+  </div>
+</body>
+
 </html>

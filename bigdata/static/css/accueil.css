@@ -60,7 +60,7 @@ body {
   border-bottom-color: rgba(255, 255, 255, .25);
 }
 
-.nav-masthead .nav-link + .nav-link {
+.nav-masthead .nav-link+.nav-link {
   margin-left: 1rem;
 }
 
@@ -74,11 +74,24 @@ body {
   height: 150px;
 }
 
-.fontsize{
+.fontsize {
   font-size: 0.8em;
   font-weight: bold;
 }
 
+.dimension {
+  width: 50%;
+  height: 400px;
+}
+
+.imagee {
+  max-width: auto;
+  max-height: 100%;
+}
+
+table.dataTable {
+  background-color: #fff;
+}
 
 /*
  * Cover
@@ -86,13 +99,14 @@ body {
 .cover {
   padding: 0 1.5rem;
 }
+
 .cover .btn-lg {
   padding: .75rem 1.25rem;
   font-weight: 700;
 }
 
-.datasetState{
-  color:red;
+.datasetState {
+  color: red;
 }
 
 
@@ -118,12 +132,13 @@ body {
 /*
  * Profile
  */
- table {
+table {
   border-collapse: collapse;
   width: 100%;
 }
 
-th, td {
+th,
+td {
   text-align: left;
   padding: 8px;
 }
