@@ -4,21 +4,23 @@ import zipfile
 import os
 import json
 import numpy as np
+import tensorflow
 import exifread
 from keras.applications import EfficientNetB0
 from keras.utils import load_img, img_to_array
-from tensorflow.keras.applications.resnet50 import ResNet50, preprocess_input, decode_predictions
+from keras.applications.resnet import ResNet50, preprocess_input, decode_predictions
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 from collections import defaultdict
 from scipy.sparse import csr_matrix
 from sklearn.neighbors import NearestNeighbors
 
-input_file = '../data/unsplash-research-dataset-lite-latest/photos.tsv000'
-output_dir = '../data/images/'
+input_file = './bigdata_app/data/unsplash-research-dataset-lite-latest/photos.tsv000'
+output_dir = './bigdata_app/data/images/'
 url = 'https://unsplash.com/data/lite/latest'
-zip_file = '../data/unsplash-research-dataset-lite-latest.zip'
-extract_dir = '../data/unsplash-research-dataset-lite-latest'
+zip_file = './bigdata_app/data/unsplash-research-dataset-lite-latest.zip'
+extract_dir = './bigdata_app/data/unsplash-research-dataset-lite-latest'
+
 
 
 def download_unsplash_dataset(url, zip_file, extract_dir):
@@ -168,13 +170,14 @@ def extract_image_metadata(input_dir, output_file):
 
 
 
-def add_user_preference(user_id, image_id, preferences_file='../data/user_preferences.json'):
+def add_user_preference(user_id, image_id, preferences_file='./bigdata_app/data/user_preferences.json'):
     if not os.path.exists(preferences_file):
         with open(preferences_file, 'w') as f:
             json.dump([], f)
 
     with open(preferences_file, 'r') as f:
         preferences = json.load(f)
+
 
     preference = {'user_id': user_id, 'image_id': image_id}
     preferences.append(preference)
@@ -183,48 +186,55 @@ def add_user_preference(user_id, image_id, preferences_file='../data/user_prefer
         json.dump(preferences, f)
 
 
-def content_based_recommendation(user_id, metadata_file='../data/metadata.json', preferences_file='../data/user_preferences.json'):
-    # Charger les métadonnées des images et les préférences des utilisateurs
+def content_based_recommendation(user_id, metadata_file='./bigdata_app/data/metadata.json', preferences_file='./bigdata_app/data/user_preferences.json'):
+    # Load image metadata and user preferences
     with open(metadata_file, 'r') as f:
         metadata = json.load(f)
 
     with open(preferences_file, 'r') as f:
         preferences = json.load(f)
 
-    # Filtrer les images aimées par l'utilisateur
+    # Filter images liked by the user
     user_preferences = [p for p in preferences if p['user_id'] == user_id]
     liked_images = [p['image_id'] for p in user_preferences]
 
-    # Créer un dictionnaire pour associer les ID d'image aux tags
+    # Create a dictionary to associate image IDs with tags
     image_tags = {item['filename']: ' '.join(item['image_tags']) for item in metadata}
 
-    # Utiliser un TfidfVectorizer pour transformer les tags en vecteurs
-    vectorizer = TfidfVectorizer()
-    image_vectors = vectorizer.fit_transform(image_tags.values())
+    try:
+        # Use a TfidfVectorizer to transform the tags into vectors
+        vectorizer = TfidfVectorizer()
+        image_vectors = vectorizer.fit_transform(image_tags.values())
 
-    # Calculer les similarités entre les images
-    similarity_matrix = cosine_similarity(image_vectors)
+        # Calculate similarities between images
+        similarity_matrix = cosine_similarity(image_vectors)
 
-    # Trouver les indices des images aimées par l'utilisateur
-    liked_image_indices = [list(image_tags.keys()).index(img_id) for img_id in liked_images]
+        # Find indices of images liked by the user
+        liked_image_indices = [list(image_tags.keys()).index(img_id) for img_id in liked_images]
 
-    # Calculer les scores de recommandation pour chaque image en fonction de leur similarité
-    recommendation_scores = np.sum(similarity_matrix[liked_image_indices], axis=0)
+        # Calculate recommendation scores for each image based on their similarity
+        recommendation_scores = np.sum(similarity_matrix[liked_image_indices], axis=0)
 
-    # Trouver les indices des images recommandées
-    recommended_image_indices = np.argsort(recommendation_scores)[::-1]
+        # Find indices of recommended images
+        recommended_image_indices = np.argsort(recommendation_scores)[::-1]
 
-    # Retourner les ID des images recommandées
-    recommended_image_ids = [list(image_tags.keys())[index] for index in recommended_image_indices]
+        # Return the IDs of the recommended images
+        recommended_image_ids = [list(image_tags.keys())[index] for index in recommended_image_indices]
 
-    # Filtrer les images déjà aimées par l'utilisateur
-    recommended_image_ids = [img_id for img_id in recommended_image_ids if img_id not in liked_images]
+        # Filter images already liked by the user
+        recommended_image_ids = [img_id for img_id in recommended_image_ids if img_id not in liked_images]
+
+    except ValueError as e:
+        print(f"Error: {str(e)}")
+        print("Returning an empty list of recommendations.")
+        recommended_image_ids = []
 
     return recommended_image_ids[:10]
 
 
 
-def collaborative_filtering_recommendation(user_id, preferences_file='../data/user_preferences.json', k=10):
+
+def collaborative_filtering_recommendation(user_id, preferences_file='./bigdata_app/data/user_preferences.json', k=10):
     # Charger les préférences des utilisateurs
     with open(preferences_file, 'r') as f:
         preferences = json.load(f)
@@ -273,7 +283,7 @@ def collaborative_filtering_recommendation(user_id, preferences_file='../data/us
 
 
 
-def hybrid_recommendation(user_id, alpha=0.5, metadata_file='../data/metadata.json', preferences_file='../data/user_preferences.json', k=10):
+def hybrid_recommendation(user_id, alpha=0.5, metadata_file='./bigdata_app/data/metadata.json', preferences_file='./bigdata_app/data/user_preferences.json', k=10):
     content_based_recs = content_based_recommendation(user_id, metadata_file, preferences_file)
     collaborative_recs = collaborative_filtering_recommendation(user_id, preferences_file, k)
 
@@ -291,9 +301,7 @@ def hybrid_recommendation(user_id, alpha=0.5, metadata_file='../data/metadata.js
     return recommended_image_ids[:10]
 
 
-
-
-if __name__ == '__main__':
+def insertDefaultData():
     # Download the Unsplash dataset
     download_unsplash_dataset(url, zip_file, extract_dir)
 
@@ -302,8 +310,8 @@ if __name__ == '__main__':
     download_images(input_file, output_dir, num_images)
 
     # Extract metadata from the images
-    input_dir = '../data/images/'
-    output_file = '../data/metadata.json'
+    input_dir = './bigdata_app/data/images/'
+    output_file = './bigdata_app/data/metadata.json'
     extract_image_metadata(input_dir, output_file)
 
     # Simuler les préférences des utilisateurs

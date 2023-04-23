@@ -1,12 +1,9 @@
-bigdata/bigdata_app/data/
+bigdata/bigdata_app/data/images/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
-
-# Dossier images dataset
-unsplash_dataset
 
 # C extensions
 *.so

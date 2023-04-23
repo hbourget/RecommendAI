@@ -1,3 +1,5 @@
+import threading
+
 from django.shortcuts import render
 
 # Create your views here.
@@ -12,19 +14,18 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 import random
 import os
 import csv
+from .function.function import *
 
 
-from .download_dataset import *
+def getImageUrl(imageName):
+    img = imageName.split(".")[0]
 
-
-def randomURL(random_line):
-    with open("unsplash_dataset/photos.tsv000", "r", encoding="utf-8") as f:
+    with open("./bigdata_app/data/unsplash-research-dataset-lite-latest/photos.tsv000", "r", encoding="utf-8") as f:
         reader = csv.reader(f, delimiter="\t")
-        # Itération sur chaque ligne du fichier
         for i, row in enumerate(reader):
-            if i == random_line:
+            if img == row[0]:
                 url = row[2]
-                print(url)
+                break
 
     return url
 
@@ -33,32 +34,37 @@ def accueil_view(request):
     if not request.user.is_authenticated:
         return redirect('login')
 
-    if not os.path.exists(download_dir):
-        os.mkdir(download_dir)
-
-    if len(os.listdir(download_dir)) == 0:
+    if not os.path.exists("./bigdata_app/data/user_preferences.json"):
         status = 0
         url_image = None
+        name_image= None
     else:
         status = 1
-        randomNumber = random.randint(0, 20000)
-        url_image = randomURL(randomNumber)
+        names_recommended = hybrid_recommendation(request.user.id)
+        print(names_recommended)
+        if(len(names_recommended) == 0):
+            names_recommended = collaborative_filtering_recommendation(request.user.id)
+        name_image = names_recommended[random.randint(0, len(names_recommended)-1)]
+        url_image = getImageUrl(name_image)
 
     if request.method == 'POST':
         if request.POST.get('like') == '1':
-            print("Bonjour")
-        elif request.POST.get('like') == '0':
-            print("au revoir")
+            add_user_preference(request.user.id, name_image)
+
     context = {'status': status, 'url_image': url_image}
     return render(request, 'accueil.html', context)
 
 
+def download_all_data_async():
+    t = threading.Thread(target=insertDefaultData)
+    t.start()
+
 def dataset_view(request):
     if not request.user.is_authenticated:
         return redirect('login')
-
-    download_unsplash_dataset(download_dir)
-    return render(request, 'acceuil.html')
+    if not os.path.exists("./bigdata_app/data/user_preferences.json"):
+        download_all_data_async()
+    return redirect('accueil')
 
 
 def login_view(request):
@@ -91,9 +97,3 @@ def logout_view(request):
         logout(request)
         return redirect('login')
 
-
-def profile_view(request):
-    if not request.user.is_authenticated:
-        # return redirect('login')
-        pass
-    return render(request, 'profile.html')
