@@ -1,5 +1,5 @@
 bigdata/bigdata_app/data/images/
-
+.idea/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
