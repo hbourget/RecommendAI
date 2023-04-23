@@ -10,9 +10,17 @@
 
 ## Fonctionnement
 
-Lancer le serveur Django depuis le dossier RecommendAI/bigdata avec la commande `python manage.py runserver`
+- Lancer le serveur Django depuis le dossier RecommendAI/bigdata avec la commande `python manage.py runserver`
+- L'application est disponible ici `localhost:8000`
+- L'application est composée de 3 pages :
+  - La page d'authentification
+  - La page d'accueil et de recommendation
 
-![Architecture](../../images/Project-Architecture.png "Architecture")
+
+![Interface graphique 1](docs/interface1.png)
+
+![Interface graphique 2](docs/interface2.png)
+
 
 ### Collecte de données
 
