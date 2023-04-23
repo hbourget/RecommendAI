@@ -1,3 +1,33 @@
+# ReccomendAI, mise en place d'un [système de recommandation](https://en.wikipedia.org/wiki/Recommender_system)
+
+## Objectifs
+
+1.  Collecte de données
+2.  Étiquetage et annotation
+3.  Analyses de données
+4.  Visualisation des données
+5.  Système de recommandation
+
+## Fonctionnement
+
+Lancer le serveur Django depuis le dossier RecommendAI/bigdata avec la commande `python manage.py runserver`
+
+![Architecture](../../images/Project-Architecture.png "Architecture")
+
+### Collecte de données
+
+### Étiquetage et annotation
+
+### Analyses de données
+
+### Visualisation des données
+
+### Système de recommandation
+
+
+
+# SUJET PROJET BIGDATA
+
 # Projet
 
 ## Objectifs
