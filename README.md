@@ -2,19 +2,21 @@
 
 ## Objectifs
 
-1.  Collecte de données
-2.  Étiquetage et annotation
-3.  Analyses de données
-4.  Visualisation des données
-5.  Système de recommandation
 
-## Fonctionnement
+## Fonctionnement & Installation
 
-- Lancer le serveur Django depuis le dossier RecommendAI/bigdata avec la commande `python manage.py runserver`
-- L'application est disponible ici `localhost:8000`
-- L'application est composée de 3 pages :
+- `git clone https://github.com/hbourget/RecommendAI.git`
+- `cd RecommendAI`
+- `pip install -r requirements.txt`
+- `cd bigdata`
+- `python manage.py runserver`
+
+
+
+- L'application est disponible sur `localhost:8000`
+- Elle est composée de 3 pages :
   - La page d'authentification
-  - La page d'accueil et de recommendation
+  - La page d'accueil / recommendation
 
 
 ![Interface graphique 1](docs/interface1.png)
