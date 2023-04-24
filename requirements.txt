@@ -33,3 +33,9 @@ typing_extensions==4.5.0
 urllib3==1.26.15
 Werkzeug==2.2.3
 wrapt==1.14.1
+django
+tensorflow-macos
+tensorflow-metal
+exifread
+tqdm
+scikit-learn

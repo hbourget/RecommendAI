@@ -14,6 +14,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from collections import defaultdict
 from scipy.sparse import csr_matrix
 from sklearn.neighbors import NearestNeighbors
+import tqdm
 
 input_file = './bigdata_app/data/unsplash-research-dataset-lite-latest/photos.tsv000'
 output_dir = './bigdata_app/data/images/'
@@ -37,12 +38,21 @@ def download_unsplash_dataset(url, zip_file, extract_dir):
         os.remove(zip_file)
         print(f'Removing empty zip file {zip_file}')
         print('Downloading Unsplash dataset...')
-        urllib.request.urlretrieve(url, zip_file)
+        # Determine the file's size before downloading
+        file_size = int(urllib.request.urlopen(url).info().get('Content-Length', -1))
+        print(file_size)
+        # Set up the progress bar
+        with tqdm(unit='B', unit_scale=True, unit_divisor=1024, total=file_size) as pbar:
+            urllib.request.urlretrieve(url, zip_file, reporthook=lambda blocks, block_size, total_size: pbar.update(
+                block_size * blocks))
+
+        print(f'Unsplash dataset downloaded to {zip_file}')
     else:
         print(f'Zip file {zip_file} already exists and is not empty.')
 
     # Extract the zip file
     if os.path.exists(zip_file):
+        print("Extracting Unsplash dataset...")
         with zipfile.ZipFile(zip_file) as zf:
             zf.extractall(extract_dir)
 
@@ -77,7 +87,7 @@ def download_images(input_file, output_dir, num_images):
     with open(input_file, 'r', encoding='utf-8') as f:
         reader = csv.DictReader(f, delimiter='\t')
 
-        for i, row in enumerate(reader):
+        for i, row in tqdm.tqdm(enumerate(reader), total=num_images):
             if i >= num_images:
                 break
 
@@ -86,12 +96,8 @@ def download_images(input_file, output_dir, num_images):
                 image_path = os.path.join(output_dir, f"{row['photo_id']}.jpg")
 
                 # Check if the image has already been downloaded
-                if os.path.exists(image_path):
-                    continue
-
-                urllib.request.urlretrieve(image_url, image_path)
-
-                print(f"Downloaded image {i + 1}/{num_images}: {image_path}")
+                if not os.path.exists(image_path):
+                    urllib.request.urlretrieve(image_url, image_path)
             except Exception as e:
                 print(f"Failed to download image {i + 1}: {str(e)}")
 
