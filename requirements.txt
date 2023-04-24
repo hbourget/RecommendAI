@@ -39,3 +39,4 @@ tensorflow-metal
 exifread
 tqdm
 scikit-learn
+pillow
