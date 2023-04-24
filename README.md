@@ -12,11 +12,14 @@
 - `python manage.py runserver`
 
 
-
 - L'application est disponible sur `localhost:8000`
 - Elle est composée de 3 pages :
   - La page d'authentification
   - La page d'accueil / recommendation
+
+Leq identifiants par défaut sont :
+- `username: hugo`
+- `password: hugo`
 
 
 ![Interface graphique 1](docs/interface1.png)
