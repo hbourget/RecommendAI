@@ -18,10 +18,22 @@
   - La page d'authentification
   - La page d'accueil / recommendation
 
+<u>Page d'accueil sans dataset :</u>
 
-![Interface graphique 1](docs/interface1.png)
+<div style="display: weight=50%">
+    <img src="docs/interface1.png" alt="Accueil" width="50%"/>
+</div>
 
-![Interface graphique 2](docs/interface2.png)
+Le dataset n'est pas présent de base, il faut le telecharger sur la machine voulant realiser les tests.
+
+<u>Page d'accueil avec le dataset deja telechargé :</u>
+
+<div style="display: weight=50%">
+    <img src="docs/interface2.png" alt="Accueil" width="50%"/>
+</div>
+
+Si le dataset est deja present, il sera detecté automatiquement, il sera donc possible d'aimer ou non des images dans le but d'apprendre a notre modele quels images sont les préferés de l'utilisateur.
+Ainsi, le modele pourra recommander des images en fonction des préférences de celui-ci.
 
 
 ### Collecte de données
@@ -62,7 +74,7 @@ Les principales tâches du projet sont présentées ci-dessous :
 7.  Rapport
 
 
-![Architecture](../../images/Project-Architecture.png "Architecture")
+![Architecture](../../images/Project-Architecture.png)
 
 ### Collecte de données
 
