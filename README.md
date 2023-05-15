@@ -18,11 +18,19 @@
   - La page d'authentification
   - La page d'accueil / recommendation
 
+<u>Page d'acceuil sans le dataset :</u>
+<div style="weight:50%">
 
 ![Interface graphique 1](docs/interface1.png)
+</div>
+
+<u>Page d'acceuil avec le dataset deja telechargé :</u>
+<div style="weight:50%">
 
 ![Interface graphique 2](docs/interface2.png)
+</div>
 
+S'il le dataset est deja téléchargé, il sera détecté automatiquement. On peut ensuite commencer a aimer ou non les images aléatoirement proposées afin d'entrainer le modele. Ainsi et a force d'utilisation, le modele sera de plus en plus précis et les images proposées seront de plus en plus pertinentes par rapport au gouts de l'utilisateur.
 
 ### Collecte de données
 
