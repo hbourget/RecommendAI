@@ -1,4 +1,4 @@
-# ReccomendAI, mise en place d'un [système de recommandation](https://en.wikipedia.org/wiki/Recommender_system)
+# RecommendAI, mise en place d'un [système de recommandation](https://en.wikipedia.org/wiki/Recommender_system)
 
 ## Objectifs
 

@@ -1,27 +1,26 @@
 import csv
+import os
 import urllib.request
 import zipfile
-import os
-import json
-import numpy as np
-import tensorflow
-import exifread
-from keras.applications import EfficientNetB0
-from keras.utils import load_img, img_to_array
-from keras.applications.resnet import ResNet50, preprocess_input, decode_predictions
-from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.feature_extraction.text import TfidfVectorizer
 from collections import defaultdict
-from scipy.sparse import csr_matrix
-from sklearn.neighbors import NearestNeighbors
+
+import exifread
+import numpy as np
 import tqdm
+from keras.applications import EfficientNetB0
+from keras.applications.resnet import preprocess_input, decode_predictions
+from keras.utils import load_img, img_to_array
+from pymongo import MongoClient
+from scipy.sparse import csr_matrix
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.neighbors import NearestNeighbors
 
-input_file = './bigdata_app/data/unsplash-research-dataset-lite-latest/photos.tsv000'
-output_dir = './bigdata_app/data/images/'
+input_file = '/data/unsplash-research-dataset-lite-latest/photos.tsv000'
+output_dir = '/data/images/'
 url = 'https://unsplash.com/data/lite/latest'
-zip_file = './bigdata_app/data/unsplash-research-dataset-lite-latest.zip'
-extract_dir = './bigdata_app/data/unsplash-research-dataset-lite-latest'
-
+zip_file = '/data/unsplash-research-dataset-lite-latest.zip'
+extract_dir = '/data/unsplash-research-dataset-lite-latest'
 
 
 def download_unsplash_dataset(url, zip_file, extract_dir):
@@ -115,12 +114,14 @@ def download_images(input_file, output_dir, num_images):
 # Cache for the model
 model_cache = None
 
+
 # Load and cache the model
 def load_model():
     global model_cache
     if model_cache is None:
         model_cache = EfficientNetB0(weights='imagenet')
     return model_cache
+
 
 # Classify an image
 def classify_image(image_path):
@@ -140,16 +141,16 @@ def classify_image(image_path):
     return tags
 
 
-def extract_image_metadata(input_dir, output_file):
+def extract_image_metadata(input_dir, db_collection):
     # Check if the input directory exists
     if not os.path.isdir(input_dir):
         print(f'Input directory {input_dir} does not exist.')
         return
 
-    # Check if the output file exists
-    if os.path.exists(output_file):
-        print(f'Output file {output_file} already exists.')
-        return
+    # Connect to the MongoDB client
+    client = MongoClient("mongodb://mongo:27017/")
+    db = client["image_db"]
+    collection = db[db_collection]
 
     # Extract metadata from images
     metadata = []
@@ -160,45 +161,39 @@ def extract_image_metadata(input_dir, output_file):
                 with open(file_path, 'rb') as f:
                     tags = classify_image(file_path)
                     exif_tags = exifread.process_file(f, details=False, stop_tag='UNDEF')
-                    metadata.append({
+                    doc = {
                         'filename': file,
                         'tags': {str(tag): str(value) for tag, value in exif_tags.items() if tag != 'JPEGThumbnail'},
                         'image_tags': tags
-                    })
+                    }
+                    collection.insert_one(doc)  # insert the document into MongoDB
+                    metadata.append(doc)
             except Exception as e:
                 print(f"Failed to extract metadata from {file}: {str(e)}")
 
-    # Write metadata to output file
-    with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump(metadata, f, indent=4)
-
-    print(f"Metadata extracted from {len(metadata)} images and saved to {output_file}")
+    print(f"Metadata extracted from {len(metadata)} images and inserted into MongoDB")
 
 
-
-def add_user_preference(user_id, image_id, preferences_file='./bigdata_app/data/user_preferences.json'):
-    if not os.path.exists(preferences_file):
-        with open(preferences_file, 'w') as f:
-            json.dump([], f)
-
-    with open(preferences_file, 'r') as f:
-        preferences = json.load(f)
-
+def add_user_preference(user_id, image_id, db_collection):
+    # Connect to the MongoDB client
+    client = MongoClient("mongodb://mongo:27017/")
+    db = client["image_db"]
+    collection = db[db_collection]
 
     preference = {'user_id': user_id, 'image_id': image_id}
-    preferences.append(preference)
-
-    with open(preferences_file, 'w') as f:
-        json.dump(preferences, f)
+    collection.insert_one(preference)  # insert the document into MongoDB
 
 
-def content_based_recommendation(user_id, metadata_file='./bigdata_app/data/metadata.json', preferences_file='./bigdata_app/data/user_preferences.json'):
-    # Load image metadata and user preferences
-    with open(metadata_file, 'r') as f:
-        metadata = json.load(f)
+def content_based_recommendation(user_id, db_collection_metadata, db_collection_preferences):
+    # Connect to the MongoDB client
+    client = MongoClient("mongodb://mongo:27017/")
+    db = client["image_db"]
 
-    with open(preferences_file, 'r') as f:
-        preferences = json.load(f)
+    # Load image metadata and user preferences from MongoDB
+    metadata_collection = db[db_collection_metadata]
+    preferences_collection = db[db_collection_preferences]
+    metadata = list(metadata_collection.find())
+    preferences = list(preferences_collection.find())
 
     # Filter images liked by the user
     user_preferences = [p for p in preferences if p['user_id'] == user_id]
@@ -238,12 +233,15 @@ def content_based_recommendation(user_id, metadata_file='./bigdata_app/data/meta
     return recommended_image_ids[:10]
 
 
+def collaborative_filtering_recommendation(user_id, db_collection_preferences, k=10):
+    # Connect to the MongoDB client
+    client = MongoClient("mongodb://mongo:27017/")
+    db = client["image_db"]  # replace "mydatabase" with your database name
 
+    # Charger les préférences des utilisateurs à partir de MongoDB
+    preferences_collection = db[db_collection_preferences]
+    preferences = list(preferences_collection.find())
 
-def collaborative_filtering_recommendation(user_id, preferences_file='./bigdata_app/data/user_preferences.json', k=10):
-    # Charger les préférences des utilisateurs
-    with open(preferences_file, 'r') as f:
-        preferences = json.load(f)
     # Créer une matrice utilisateur-image
     user_ids = sorted(list(set([p['user_id'] for p in preferences])))
     image_ids = sorted(list(set([p['image_id'] for p in preferences])))
@@ -288,10 +286,10 @@ def collaborative_filtering_recommendation(user_id, preferences_file='./bigdata_
     return recommended_image_ids[:10]
 
 
-
-def hybrid_recommendation(user_id, alpha=0.5, metadata_file='./bigdata_app/data/metadata.json', preferences_file='./bigdata_app/data/user_preferences.json', k=10):
-    content_based_recs = content_based_recommendation(user_id, metadata_file, preferences_file)
-    collaborative_recs = collaborative_filtering_recommendation(user_id, preferences_file, k)
+def hybrid_recommendation(user_id, alpha=0.5, db_collection_metadata="metadata",
+                          db_collection_preferences="preferences", k=10):
+    content_based_recs = content_based_recommendation(user_id, db_collection_metadata, db_collection_preferences)
+    collaborative_recs = collaborative_filtering_recommendation(user_id, db_collection_preferences, k)
 
     # Combiner les scores de recommandation des deux approches
     combined_scores = defaultdict(float)
@@ -307,38 +305,40 @@ def hybrid_recommendation(user_id, alpha=0.5, metadata_file='./bigdata_app/data/
     return recommended_image_ids[:10]
 
 
-def insertDefaultData():
-    # Download the Unsplash dataset
-    download_unsplash_dataset(url, zip_file, extract_dir)
+if __name__ == "__main__":
+    # Connect to MongoDB
+    client = MongoClient('mongodb://mongo:27017/')
+    db = client['image_db']
+    coll_metadata = db['metadata']
+    coll_preferences = db['preferences']
 
-    # Download the images
-    num_images = 500
-    download_images(input_file, output_dir, num_images)
+    # Download the Unsplash dataset and images here
+    # Add your own code
 
     # Extract metadata from the images
     input_dir = './bigdata_app/data/images/'
-    output_file = './bigdata_app/data/metadata.json'
-    extract_image_metadata(input_dir, output_file)
+    extract_image_metadata(input_dir, coll_metadata)
 
     # Simuler les préférences des utilisateurs
-    add_user_preference(1, 'liZpmbRG4WQ.jpg')
-    add_user_preference(1, 'FJc8DIDMGek.jpg')
-    add_user_preference(2, '4_Bc9CSm70A.jpg')
-    add_user_preference(2, '9CjgeMAM2SI.jpg')
-    add_user_preference(3, '731BXpcasJI.jpg')
-    add_user_preference(3, 'AMuKRdPBuek.jpg')
+    add_user_preference(1, 'liZpmbRG4WQ.jpg', coll_preferences)
+    add_user_preference(1, 'FJc8DIDMGek.jpg', coll_preferences)
+    add_user_preference(2, '4_Bc9CSm70A.jpg', coll_preferences)
+    add_user_preference(2, '9CjgeMAM2SI.jpg', coll_preferences)
+    add_user_preference(3, '731BXpcasJI.jpg', coll_preferences)
+    add_user_preference(3, 'AMuKRdPBuek.jpg', coll_preferences)
 
     # Tester les recommandations basées sur le contenu
-    content_recs = content_based_recommendation(1)
+    content_recs = content_based_recommendation(1, coll_metadata, coll_preferences)
     print("Recommandations basées sur le contenu pour l'utilisateur 1:")
     print(content_recs)
 
     # Tester les recommandations par filtrage collaboratif
-    collaborative_recs = collaborative_filtering_recommendation(1)
+    collaborative_recs = collaborative_filtering_recommendation(1, coll_preferences)
     print("Recommandations par filtrage collaboratif pour l'utilisateur 1:")
     print(collaborative_recs)
 
     # Tester les recommandations hybrides
-    hybrid_recs = hybrid_recommendation(1)
+    hybrid_recs = hybrid_recommendation(1, db_collection_metadata=coll_metadata,
+                                        db_collection_preferences=coll_preferences)
     print("Recommandations hybrides pour l'utilisateur 1:")
     print(hybrid_recs)

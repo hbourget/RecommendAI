@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: python
+    build: ./python
+    restart: unless-stopped
+    volumes:
+      - /opt/TDM/python:/app
+      - /opt/TDM/data:/data
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    restart: unless-stopped
+    volumes:
+      - /opt/TDM/db:/data/db
+    ports:
+      - "27017:27017"
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo-express
+    restart: unless-stopped
+    environment:
+      - ME_CONFIG_MONGODB_URL=mongodb://mongo:27017
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongo
+
+  web:
+    build: ./webui
+    container_name: web
+    restart: unless-stopped
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - /opt/TDM/web:/code
+      - /opt/TDM/data:/data
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongo
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s

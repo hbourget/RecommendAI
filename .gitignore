@@ -1,4 +1,4 @@
-bigdata/bigdata_app/data/images/
+webui/bigdata_app/data/images/
 .idea/
 # Byte-compiled / optimized / DLL files
 __pycache__/
