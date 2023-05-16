@@ -6,7 +6,6 @@ services:
     build: ./python
     restart: unless-stopped
     volumes:
-      - /opt/TDM/python:/app
       - /opt/TDM/data:/data
     depends_on:
       - mongo
