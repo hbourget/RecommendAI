@@ -1,4 +1,4 @@
-# ReccomendAI - Système de recommandation basé sur l'apprentissage automatique
+# RecommendAI - Système de recommandation basé sur l'apprentissage automatique
 
 ## Objectifs
 
