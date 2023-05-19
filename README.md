@@ -44,9 +44,7 @@ Voici comment il fonctionne :
 
 - `COPY function.py .`: Copie le fichier `function.py` dans le conteneur.
 
-- `CMD ["python", "function.py"]`: Définit la commande à exécuter lorsque le conteneur est lancé. Dans ce cas, il exécute le fichier `function.py` en utilisant Python
-
-.
+- `CMD ["python", "function.py"]`: Définit la commande à exécuter lorsque le conteneur est lancé. Dans ce cas, il exécute le fichier `function.py` en utilisant Python.
 
 Ce Dockerfile est utilisé pour construire une image Docker contenant l'application Python avec ses dépendances et son script `function.py`. Lorsque le conteneur est exécuté, il lance le script `function.py`.
 
@@ -84,9 +82,7 @@ Le fichier docker-compose.yml est utilisé pour décrire et exécuter plusieurs 
 
   - `mongo-express`: Le service "mongo-express" utilise l'image Docker de Mongo Express, qui est une interface utilisateur pour MongoDB. Il dépend du service "mongo" et expose le port 8081.
 
-  - `web`: Le service "web" est basé sur l'image construite à partir du Dockerfile dans le répertoire `webui`. Il utilise le conteneur "mongo" et monte des volumes pour le code source de l'application et les données. Il expose le port 8000 et effectue également une vérification de santé
-
- en vérifiant si le serveur web est accessible.
+  - `web`: Le service "web" est basé sur l'image construite à partir du Dockerfile dans le répertoire `webui`. Il utilise le conteneur "mongo" et monte des volumes pour le code source de l'application et les données. Il expose le port 8000 et effectue également une vérification de santé en vérifiant si le serveur web est accessible.
 
 Ce fichier docker-compose.yml définit la configuration pour exécuter plusieurs services Docker interconnectés. Il crée les conteneurs nécessaires pour exécuter l'application Python, la base de données MongoDB et l'interface utilisateur Web, en configurant les dépendances entre eux et en spécifiant les volumes et les ports nécessaires.
 
