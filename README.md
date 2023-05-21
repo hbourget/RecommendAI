@@ -18,7 +18,7 @@
   - La page d'authentification
   - La page d'accueil / recommendation
 
-<u>Page d'acceuil sans le dataset :</u>
+<u>Page d'accueil sans le dataset :</u>
 <div style="weight:50%">
 
 ![Interface graphique 1](docs/interface1.png)
