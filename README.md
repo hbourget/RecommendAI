@@ -1,5 +1,7 @@
 ## RecommendAI, mise en place d'un [système de recommandation](https://en.wikipedia.org/wiki/Recommender_system)
 
+![Interface graphique 1] (https://en.wikipedia.org/wiki/Recommender_system#/media/File:Collaborative_filtering.gif)
+
 ### Fonctionnement & Installation
 
 - `git clone https://github.com/hbourget/RecommendAI.git`
