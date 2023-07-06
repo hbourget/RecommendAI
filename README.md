@@ -1,6 +1,6 @@
 ## RecommendAI, mise en place d'un [système de recommandation](https://en.wikipedia.org/wiki/Recommender_system)
 
-![Interface graphique 1] (https://en.wikipedia.org/wiki/Recommender_system#/media/File:Collaborative_filtering.gif)
+![Interface graphique 1](docs/Collaborative_filtering)
 
 ### Fonctionnement & Installation
 
