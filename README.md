@@ -1,6 +1,6 @@
 ## RecommendAI, mise en place d'un [système de recommandation](https://en.wikipedia.org/wiki/Recommender_system)
 
-## Fonctionnement & Installation
+# Fonctionnement & Installation
 
 - `git clone https://github.com/hbourget/RecommendAI.git`
 - `cd RecommendAI`
